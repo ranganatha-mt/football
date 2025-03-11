@@ -98,7 +98,7 @@ const CreateMatch = ({ onClose }) => {
 
     return (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-80">
-            <div className="w-full max-w-md bg-white rounded-3xl shadow-lg p-6 relative flex flex-col">
+            <div className="w-full max-w-md bg-white rounded-3xl shadow-lg p-6 relative flex flex-col max-h-[90vh] overflow-y-auto">
                 
                 {/* Close Button */}
                 <button 

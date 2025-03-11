@@ -59,7 +59,7 @@ const MatchReviewPage = () => {
         setWarning("🏁 Match Over! Your data has been saved.");
 
         setTimeout(() => {
-          navigate("/");
+          navigate("/player/"+player_id);
         }, 3000);
 
         return;

@@ -285,6 +285,34 @@ export const matchController = {
             console.error("Error fetching match details:", error);
             return res.status(500).json({ success: false, message: "Internal server error" });
         }
-    }
+    },
+    matchesCount: async (req, res) => {
+        try {
+            const { user_type, user_id } = req.query;
+            let matchCount = 0;
+    
+            if (user_type === 'Admin') {
+                matchCount = await Match.count();
+            }
+
+            if (user_type === 'Reviewer') {
+                matchCount = await Match.count({
+                    where: { created_by: user_id }
+                });
+            }
+
+            if (user_type === 'Player') {
+                matchCount = await MatchPlayers.count({
+                    where: { player_id: user_id }
+                });
+            }
+    
+            res.json({ count: matchCount });
+        } catch (error) {
+            console.error("Error fetching matches count:", error);
+            res.status(500).json({ success: false, message: 'Error fetching matches count' });
+        }
+    },
+    
 
 };

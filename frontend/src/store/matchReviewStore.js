@@ -4,6 +4,19 @@ import axios from "axios";
 import toast from "react-hot-toast";
 
 const useMatchReviewStore = create((set) => ({
+
+  playersReviewCount:0,
+  matchesReviewCount:0,
+  matchesCount:0,
+  isLoadingPlayersReview: false,
+  isLoadingMatchesReview: false,
+  isLoadingMatches: false,
+  errorPlayersReview: false,
+  errorMatchesReview: false,
+  errorMatches: false,
+
+
+
   reviews: [],
   messages: [],
   loading: false,
@@ -86,6 +99,60 @@ const useMatchReviewStore = create((set) => ({
         console.error("Error fetching match details:", error);
         set({ selectedMatch: null });
     }
+},
+
+fetchCounts: async (user_type,user_id) => {
+      
+  set({  isLoadingPlayersReview: true,
+    isLoadingMatchesReview: true,
+    isLoadingMatches: true,
+    errorPlayersReview: false,
+    errorMatchesReview: false,
+    errorMatches: false, });
+
+  try {
+
+
+     //Fetch Players Reviewed count
+     const responsePlayersReview = await axios.get(`/api/reviews/reviewed_count?user_type=`+user_type+`&user_id=`+user_id+`&type=Players`);
+
+     if (responsePlayersReview.status === 200) {
+       set({ playersReviewCount: responsePlayersReview.data.count, isLoadingPlayersReview: false });
+     } else {
+       set({ errorPlayersReview: true, isLoadingPlayersReview: false });
+     }
+    
+     //Fetch matches Reviewed count
+     const responseMatchesReview = await axios.get(`/api/reviews/reviewed_count?user_type=`+user_type+`&user_id=`+user_id+`&type=Matches`);
+
+     if (responseMatchesReview.status === 200) {
+       set({ matchesReviewCount: responseMatchesReview.data.count, isLoadingMatchesReview: false });
+     } else {
+       set({ errorMatchesReview: true, isLoadingMatchesReview: false });
+     }
+
+
+    //Fetch matches count
+    const responseMatches = await axios.get(`/api/matches/count?user_type=`+user_type+`&user_id=`+user_id);
+
+    if (responseMatches.status === 200) {
+      set({ matchesCount: responseMatches.data.count, isLoadingMatches: false });
+    } else {
+      set({ errorMatches: true, isLoadingMatches: false });
+    }
+
+
+  } catch (error) {
+    console.error("Error fetching user counts:", error);
+    set({
+      isLoadingPlayers: false,
+      isLoadingReviewers: false,
+      isLoadingMatches: false,
+      errorPlayers: true,
+      errorReviewers: true,
+      errorMatches: true,
+    });
+  }
 },
   
   

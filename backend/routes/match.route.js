@@ -15,6 +15,8 @@ router.get("/getMatchDetails/:match_id", matchController.getMatchById);
 
 router.get("/player/:player_id", matchController.getMatchesByPlayerId);
 
+router.get("/count", matchController.matchesCount)
+
 export default router;
 
 

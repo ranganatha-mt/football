@@ -4,6 +4,10 @@ import toast from "react-hot-toast";
 import dayjs from "dayjs";
 
 const useMatchStore = create((set) => ({
+
+    matchesCount:0,  
+  isLoadingMatches: false,  
+  errorMatches: false,
     
     playerList: [],
     matches: [],
@@ -103,7 +107,37 @@ const useMatchStore = create((set) => ({
         } catch (error) {
             console.error("Error fetching users:", error);
         }
-    }
+    },
+
+    fetchCounts: async (user_type,user_id) => {
+      
+        set({  
+          isLoadingMatches: true,
+         
+          errorMatches: false, });
+      
+        try {
+      
+      
+          //Fetch matches count
+          const responseMatches = await axios.get(`/api/matches/count?user_type=`+user_type+`&user_id=`+user_id);
+      
+          if (responseMatches.status === 200) {
+            set({ matchesCount: responseMatches.data.count, isLoadingMatches: false });
+          } else {
+            set({ errorMatches: true, isLoadingMatches: false });
+          }
+      
+      
+        } catch (error) {
+          console.error("Error fetching user counts:", error);
+          set({
+           
+            isLoadingMatches: false,           
+            errorMatches: true,
+          });
+        }
+      },
 }));
 
 export default useMatchStore;

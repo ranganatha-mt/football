@@ -1,14 +1,19 @@
 import React, { Suspense,  useEffect, useRef  } from "react";
 const Card = React.lazy(() => import("../../components/Card.jsx"));
 import useUserCountStore from "../../store/useUserCountStore";
+import { useAuthStore } from "../../store/authUser";
 const Admin = () => {
+  const { user } = useAuthStore();
   const {
     playersCount,
     reviewersCount,
+    matchesCount,
     isLoadingPlayers,
     isLoadingReviewers,
+    isLoadingMatches,
     errorPlayers,
     errorReviewers,
+    errorMatches,
     fetchCounts,
   } = useUserCountStore();
 
@@ -20,7 +25,7 @@ const Admin = () => {
     }
     
 
-    fetchCounts();
+    fetchCounts(user.user_type);
   }, []);
 
 
@@ -31,7 +36,7 @@ const Admin = () => {
           <Suspense fallback={<div className="loader">Loading...</div>}>
             <Card type="Players Registered" count={playersCount}  isLoading={isLoadingPlayers} error={errorPlayers} />
             <Card type="Reviewers Registered" count={reviewersCount} isLoading={isLoadingReviewers} error={errorReviewers}/>
-            <Card type="Total Matches Conducted" count="0" />
+            <Card type="Total Matches" count={matchesCount} isLoading={isLoadingMatches} error={errorMatches} />
           </Suspense>
         </div>
       </div>

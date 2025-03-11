@@ -68,6 +68,35 @@ submitReview: async (req, res) => {
   }
 },
 
+reviewedCount: async (req, res) => {
+  try {
+      const { user_type, user_id, type } = req.query;
+
+      if (user_type !== 'Reviewer') {
+          return res.json({ count: 0 });
+      }
+
+      const column = type === 'Matches' ? 'match_id' :
+                     type === 'Players' ? 'player_id' : null;
+
+      if (!column) {
+          return res.status(400).json({ success: false, message: 'Invalid type parameter' });
+      }
+
+      const count = await MatchReview.count({
+          distinct: true,
+          col: column,
+          where: { reviewer_id: user_id }
+      });
+
+      res.json({ count });
+  } catch (error) {
+      console.error("Error fetching count:", error);
+      res.status(500).json({ success: false, message: 'Error fetching count' });
+  }
+},
+
+
 
 
 
