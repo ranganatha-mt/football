@@ -1,0 +1,101 @@
+For Backend
+-----------------
+in terminal - npm init -y
+in terminal - npm install express jsonwebtoken cookie-parser dotenv axios bcryptjs mysql2 multer sharp
+create a file server.js in backend folder
+Add "type": "module", in package.json(Default common.js)
+To run dev server change in package.json 
+"main": "backend/server.js",
+"scripts": {
+    "dev": "node backend/server.js"
+ },
+
+Made changes in server.js
+import express from 'express';
+const app = express();
+
+app.get("/", (req,res) => {
+    res.send("Server is ready");
+})
+
+app.listen(5000, () => {
+    console.log("Server started at http://localhost:5000");
+})
+
+in terminal - npm run dev
+
+"--watch"  is used for refresh the page
+
+"scripts": {
+    "dev": "node --watch backend/server.js"
+  },
+
+
+in terminal - npm install nodemon -D(Start, stop, restart, and monitor Node.js processes with ease.) it will dependencies in package.json
+Change the code in package.json
+ "scripts": {
+    "dev": "nodemon backend/server.js"
+  },
+
+
+
+
+  else if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contact)) {
+
+       /* const transporter = nodemailer.createTransport({
+            service: 'gmail',
+            secure:true,
+            port:465,
+            auth: {
+                user: ENV_VARS.EMAIL_USER,
+                pass: ENV_VARS.EMAIL_PASS,
+            },
+        });
+
+         transporter.sendMail({
+            from: ENV_VARS.EMAIL_USER,
+            to: contact,
+            subject: 'Your OTP Code',
+            text: `Your OTP is: ${otp}`,
+        }, (error, info) => {
+            if (error) {
+                console.log('Error:', error.message);
+    
+                // If there's an error sending the email, delete the OTP from the database
+                 OTP.destroy({ where: { contact } })
+                    .then(() => {
+                        // Send response only after handling the error
+                        return res.status(500).json({ success: false, message: 'Failed to send OTP.' });
+                    })
+                    .catch((dbError) => {
+                        // Handle database error if necessary
+                        console.log('Database error:', dbError.message);
+                        return res.status(500).json({ success: false, message: 'Database error while deleting OTP.' });
+                    });
+            } else {
+                // If email sent successfully, respond accordingly
+                console.log('Email sent:', info.response);
+                return res.status(200).json({ success: true, message: 'OTP sent successfully!' });
+            }
+        });
+        */
+      }
+
+
+
+Front End
+-------------
+ cd .\frontend\
+ npm create vite@latest . (. means within frontend)
+ npm i axios lucide-react react-hot-toast react-router-dom zustand
+
+ https://v3.tailwindcss.com/docs/guides/vite
+
+
+rafce
+
+
+
+Twilio Verify Number
+      SH1PKXH1WYCTSRW1QHRJMADZ
+

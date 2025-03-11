@@ -1,0 +1,73 @@
+
+CREATE TABLE users (
+    user_id INT AUTO_INCREMENT PRIMARY KEY,
+    full_name VARCHAR(255) NOT NULL,
+    contact_phone VARCHAR(15) NOT NULL,
+    contact_email VARCHAR(255) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    profile_picture VARCHAR(255),
+    position VARCHAR(50),
+    user_type ENUM('Player', 'Reviewer', 'Admin') NOT NULL, 
+    age INT, 
+    gender ENUM('Male', 'Female', 'Other'), 
+    organization_club VARCHAR(255), 
+    expertise_level ENUM('Beginner', 'Intermediate', 'Expert'),
+    registration_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    modified DATETIME,
+    session_token VARCHAR(255)
+);
+
+CREATE TABLE otp_details (
+    otp_id INT AUTO_INCREMENT PRIMARY KEY,
+    contact VARCHAR(255) NOT NULL UNIQUE,
+    otp VARCHAR(255) NOT NULL,
+    createdAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+
+CREATE TABLE matches(
+    match_id INT AUTO_INCREMENT PRIMARY KEY,
+    match_name VARCHAR(255) NOT NULL,
+    location VARCHAR(255) NOT NULL,
+    start_date DATETIME NOT NULL,
+    duration INT,
+    created_by INT,
+    status ENUM('Scheduled', 'Ongoing', 'Completed') DEFAULT 'Scheduled',
+    added_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
+CREATE TABLE match_players (
+    match_players_id INT AUTO_INCREMENT PRIMARY KEY,    
+    match_id  INT,
+    player_id INT,
+    player_name VARCHAR(255) NOT NULL,
+    created_by INT
+);
+
+
+CREATE TABLE soccer_events (
+    event_id INT AUTO_INCREMENT PRIMARY KEY,
+    match_id INT,               -- Reference to the match
+    player_id INT,              -- Reference to the player
+    team_id INT,                -- Reference to the team
+    event_type ENUM('Goal', 'Yellow Card', 'Red Card', 'Free Kick', 'Penalty Kick', 'Substitution') NOT NULL,  -- Type of event
+    event_time TIME,            -- Time of event (HH:MM:SS)
+    additional_info TEXT,       -- Any additional info like goal details, substitution, or card reasons
+    result ENUM('Goal', 'Missed', 'Saved', 'Completed', 'Not Completed') DEFAULT 'Completed', -- For events like penalty kicks or free kicks
+    player_in_id INT,           -- Player coming in (for substitutions)
+    player_out_id INT,          -- Player going out (for substitutions)
+    FOREIGN KEY (match_id) REFERENCES matches(match_id),
+    FOREIGN KEY (player_id) REFERENCES players(player_id),
+    FOREIGN KEY (team_id) REFERENCES teams(team_id),
+    FOREIGN KEY (player_in_id) REFERENCES players(player_id),
+    FOREIGN KEY (player_out_id) REFERENCES players(player_id)
+);
+
+
+
+
+
+
+
+

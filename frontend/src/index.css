@@ -1,0 +1,32 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.football-bg{
+    background-image:linear-gradient(rgba(0,0,0,0.8),rgba(0,0,0,0.6)) ,url('football_background.webp');
+}
+
+.football-home-bg{
+    background-image:linear-gradient(rgba(0,0,0,0.1),rgba(0,0,0,0.5)) ,url('football_background.webp');
+}
+
+@keyframes glowGreen {
+    0% { background-color: #4CAF50; box-shadow: 0 0 10px #4CAF50; }
+    50% { background-color: #2D3748; box-shadow: 0 0 20px #4CAF50; }
+    100% { background-color: #1A202C; box-shadow: 0 0 0px #4CAF50; }
+  }
+  
+  @keyframes glowGold {
+    0% { background-color: #FFD700; box-shadow: 0 0 10px #FFD700; }
+    50% { background-color: #3B82F6; box-shadow: 0 0 20px #FFD700; }
+    100% { background-color: #1E40AF; box-shadow: 0 0 0px #FFD700; }
+  }
+  
+  .animate-glow-green {
+    animation: glowGreen 1s ease-in-out;
+  }
+  
+  .animate-glow-gold {
+    animation: glowGold 1s ease-in-out;
+  }
+  
