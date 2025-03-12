@@ -33,21 +33,14 @@ const data_pie_chart = [
   ];
 
   const reviews = [
-    { match: "Team A vs Team B", reviewer: "Rahul Sharma", avatar: "https://i.pravatar.cc/150?img=1", rating: 4.5, comment: "Great player! Always gives 100% on the field." },
-    { match: "Team A vs Team B", reviewer: "Rahul Sharma", avatar: "https://i.pravatar.cc/150?img=1", rating: 4, comment: "Needs to work on consistency." },
-    { match: "Team C vs Team D", reviewer: "Sophia Lee", avatar: "https://i.pravatar.cc/150?img=2", rating: 5, comment: "An outstanding talent with amazing skills!" },
-    { match: "Team C vs Team D", reviewer: "Michael Johnson", avatar: "https://i.pravatar.cc/150?img=3", rating: 4, comment: "Very consistent performance, reliable player." },
-    { match: "Team A vs Team B", reviewer: "Sophia Lee", avatar: "https://i.pravatar.cc/150?img=2", rating: 5, comment: "Truly a game-changer on the field!" }
+    { match_id: "1", match: "Team A vs Team B", reviewer: "Rahul Sharma",  comment: "Great player! Always gives 100% on the field." },
+    { match_id: "1", match: "Team A vs Team B", reviewer: "Rahul Sharma",  comment: "Needs to work on consistency." },
+    { match_id: "2", match: "Team C vs Team D", reviewer: "Sophia Lee",  comment: "An outstanding talent with amazing skills!" },
+    { match_id: "2", match: "Team C vs Team D", reviewer: "Michael Johnson",  comment: "Very consistent performance, reliable player." },
+    { match_id: "1", match: "Team A vs Team B", reviewer: "Sophia Lee",  comment: "Truly a game-changer on the field!" }
   ];
-
-   // Group reviews by match name
-   const groupedReviews = reviews.reduce((acc, { match, reviewer, avatar, rating, comment }) => {
-    if (!acc[match]) acc[match] = {};
-    if (!acc[match][reviewer]) acc[match][reviewer] = { avatar, reviews: [] };
-    
-    acc[match][reviewer].reviews.push({ rating, comment });
-    return acc;
-  }, {});
+  
+ 
 
 const PlayerStatsPage = () => {
     const { user } = useAuthStore();
@@ -62,6 +55,11 @@ const PlayerStatsPage = () => {
         isLoadingMatches,      
         errorMatches,
         fetchCounts,
+      } = useMatchStore();
+
+      const {     
+       reviews,
+        fetchReviews,
       } = useMatchStore();
 
     const [page, setPage] = useState(1);
@@ -79,7 +77,20 @@ const PlayerStatsPage = () => {
         setLoading(true);
         fetchMatchesByPlayerId(id, page, limit).finally(() => setLoading(false));
         fetchCounts('Player',id);
+        fetchReviews(id);
     }, [id, page]);
+
+
+
+
+     // Group reviews by match_id
+     const groupedReviews = reviews.reduce((acc, { match_id, match_name, reviewer_name, message }) => {
+      if (!acc[match_id]) acc[match_id] = { match_name, reviewers: {} };
+      if (!acc[match_id].reviewers[reviewer_name]) acc[match_id].reviewers[reviewer_name] = { reviews: [] };
+    
+      acc[match_id].reviewers[reviewer_name].reviews.push({ comment: message });
+      return acc;
+    }, {});
 
     return (
         <Layout>
@@ -141,32 +152,29 @@ const PlayerStatsPage = () => {
     </div>
 
 
-    <div className="p-4 bg-gray-100 rounded-2xl shadow-md  flex flex-col gap-4 max-h-[90vh] overflow-y-auto">
-    {Object.entries(groupedReviews).map(([match, reviewers]) => (
-        <div key={match} className="p-4 rounded-2xl shadow-md bg-white">
-          <h2 className="text-xl font-bold text-gray-900 mb-3">{match}</h2>
+    <div className="p-4 bg-gray-100 rounded-2xl shadow-md flex flex-col gap-4 max-h-[90vh] overflow-y-auto">
+  {Object.entries(groupedReviews).map(([matchId, { match_name, reviewers }]) => (
+    <div key={matchId} className="p-4 rounded-2xl shadow-md bg-white">
+      <h2 className="text-xl font-bold text-gray-900 mb-1">{match_name}</h2>
+      {/* <p className="text-sm text-gray-500 mb-3">Match ID: {matchId}</p> */}
 
-          {Object.entries(reviewers).map(([reviewer, {  reviews }]) => (
-            <div key={reviewer} className="mb-4 p-3 bg-gray-50 rounded-lg">
-              <div className="flex gap-4 items-center">
-                
-                <div className="font-semibold text-lg text-gray-800">{reviewer}</div>
+      {Object.entries(reviewers).map(([reviewer, { reviews }]) => (
+        <div key={reviewer} className="mb-4 p-3 bg-gray-50 rounded-lg">
+          <div className="flex gap-4 items-center">
+            <div className="font-semibold text-lg text-gray-800">{reviewer}</div>
+          </div>
+          <div className="mt-2 space-y-2">
+            {reviews.map(({ comment }, index) => (
+              <div key={index} className="border-l-4 border-yellow-500 pl-3">
+                <p className="text-gray-600 mt-1">{comment}</p>
               </div>
-              <div className="mt-2 space-y-2">
-                {reviews.map(({  comment }, index) => (
-                  <div key={index} className="border-l-4 border-yellow-500 pl-3">
-                    <div className="flex items-center text-yellow-500">
-                     
-                    </div>
-                    <p className="text-gray-600  mt-1">{comment}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       ))}
     </div>
+  ))}
+</div>
 
 
 

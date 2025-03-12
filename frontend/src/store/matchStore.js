@@ -8,6 +8,8 @@ const useMatchStore = create((set) => ({
     matchesCount:0,  
   isLoadingMatches: false,  
   errorMatches: false,
+
+  reviews:[],
     
     playerList: [],
     matches: [],
@@ -136,6 +138,17 @@ const useMatchStore = create((set) => ({
             isLoadingMatches: false,           
             errorMatches: true,
           });
+        }
+      },
+
+      fetchReviews: async (player_id) => {       
+        try {
+          const response = await axios.get(`/api/messages/0/0/${player_id}`);
+          set({ reviews: response.data });
+        } catch (error) {
+          console.error("Error fetching messages:", error);
+        } finally {
+          
         }
       },
 }));

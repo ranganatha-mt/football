@@ -45,9 +45,9 @@ const useMatchReviewStore = create((set) => ({
     }
   },
 
-  sendMessage: async (matchId, reviewerId,player_id, message) => {
+  sendMessage: async (matchId, reviewerId,player_id, message,reviewer_name,match_name) => {
     try {
-      const newMessage = { match_id: matchId, reviewer_id: reviewerId,player_id:player_id, message };
+      const newMessage = { match_id: matchId, reviewer_id: reviewerId,player_id:player_id, message,reviewer_name,match_name };
       await axios.post("/api/messages", newMessage);
       set((state) => ({ messages: [...state.messages, newMessage] })); // Instantly update UI
     } catch (error) {

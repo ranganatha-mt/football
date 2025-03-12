@@ -14,6 +14,7 @@ const MatchReviewPage = () => {
   const { matchId, player_id } = useParams();
   const { user } = useAuthStore();
   const user_id = user?.user_id;
+  const reviewer_name = user?.full_name;
   const { reviews, messages, fetchReviews, fetchMessages, sendMessage, submitReview, selectedMatch, fetchMatchById } = useMatchReviewStore();
   const reviewer_id = user_id;
   const messagesEndRef = useRef(null);
@@ -93,7 +94,7 @@ const MatchReviewPage = () => {
     const message = e.target.message.value.trim();
     if (!message) return;
 
-    sendMessage(matchId, reviewer_id, player_id, message);
+    sendMessage(matchId, reviewer_id, player_id, message,reviewer_name,selectedMatch.match_name);
     setHighlightedMsgId(messages.length);
     setTimeout(() => setHighlightedMsgId(null), 1000);
     e.target.reset();
@@ -187,6 +188,7 @@ const MatchReviewPage = () => {
         <form onSubmit={handleSendMessage} className="flex w-full max-w-2xl">
           <input
             type="text"
+            autoComplete="off"
             name="message"
             className="flex-1 bg-gray-800 border border-gray-600 rounded-full px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-xl"
             placeholder="Type a message..."

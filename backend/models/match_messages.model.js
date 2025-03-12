@@ -22,6 +22,14 @@ export const MatchMessage  = sequelize.define("match_message", {
         type: DataTypes.TEXT,
         allowNull: false,
       },
+      reviewer_name: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      match_name: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
   }, {
     tableName: 'match_message',
     timestamps: false, // Assuming you're managing timestamps manually
