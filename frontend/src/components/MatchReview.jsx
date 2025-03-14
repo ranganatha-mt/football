@@ -26,6 +26,28 @@ const MatchReviewPage = () => {
 
   const [warning, setWarning] = useState(null);
 
+  const [activeTab, setActiveTab] = useState("category1");
+
+  const actionCategories = {
+    category1: [
+      { id: "goals", label: "⚽ Goals" },
+      { id: "passes", label: "🎯 Passes" },
+    ],
+    category2: [
+      { id: "free_kicks", label: "🥅 Free Kicks" },
+      // { id: "penalties", label: "⚡ Penalties" },
+    ],
+    category3: [
+      { id: "green_cards", label: "🟩 Green Cards" },
+      { id: "yellow_cards", label: "🟨 Yellow Cards" },
+    ],
+    category4: [
+      { id: "red_cards", label: "🟥 Red Cards" },
+      // { id: "fouls", label: "🚨 Fouls" },
+    ],
+  };
+
+
   useEffect(() => {
     fetchReviews(matchId, reviewer_id, player_id);
     fetchMessages(matchId, reviewer_id, player_id);
@@ -200,11 +222,42 @@ const MatchReviewPage = () => {
         </form>
 
         <div className="mt-4 flex flex-wrap gap-3 justify-center">
-          {["goals", "passes", "free_kicks", "green_cards", "yellow_cards", "red_cards"].map((action, index) => (
+
+        <div className="p-4">
+      {/* Tab Navigation */}
+      <div className="flex border-b border-gray-600">
+        {Object.keys(actionCategories).map((category) => (
+          <button
+            key={category}
+            onClick={() => setActiveTab(category)}
+            className={`px-4 py-2 text-white ${
+              activeTab === category ? "border-b-2 border-blue-500" : "opacity-50"
+            }`}
+          >
+            {category.replace("category", "Category ")}
+          </button>
+        ))}
+      </div>
+
+      {/* Actions under selected tab */}
+      <div className="mt-4 flex flex-wrap gap-3 justify-center">
+        {actionCategories[activeTab].map((action) => (
+          <button
+            key={action.id}
+            onClick={() => handleAction(action.id)}
+            className="bg-gradient-to-r from-blue-500 to-indigo-500 text-white px-5 py-2 rounded-full shadow-lg hover:scale-105 transition"
+          >
+            {action.label}
+          </button>
+        ))}
+      </div>
+    </div>
+
+          {/* {["goals", "passes", "free_kicks", "green_cards", "yellow_cards", "red_cards"].map((action, index) => (
             <button key={index} onClick={() => handleAction(action)} className="bg-gradient-to-r from-blue-500 to-indigo-500 text-white px-5 py-2 rounded-full shadow-lg hover:scale-105 transition">
               {action === "goals" ? "⚽ Goal" : action === "passes" ? "🎯 Pass" : action === "free_kicks" ? "🥅 Free Kick" : action === "green_cards" ? "🟩 Green Card" : action === "yellow_cards" ? "🟨 Yellow Card" : "🟥 Red Card"}
             </button>
-          ))}
+          ))} */}
         </div>
       </div>
     </Layout>
