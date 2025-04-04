@@ -23,10 +23,10 @@ const Reviewer = () => {
 
   const initialRender = useRef(true);
   useEffect(() => {
-    if (initialRender.current) {
+    /*if (initialRender.current) {
       initialRender.current = false;
       return;
-    }
+    }*/
     
 
     fetchCounts(user.user_type,user.user_id);

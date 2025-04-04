@@ -70,10 +70,10 @@ const PlayerStatsPage = () => {
     // const [selectedMatch, setSelectedMatch] = useState(null);
 
     useEffect(() => {
-        if (initialRender.current) {
+        /*if (initialRender.current) {
             initialRender.current = false;
             return;
-        }
+        }*/
         setLoading(true);
         fetchMatchesByPlayerId(id, page, limit).finally(() => setLoading(false));
         fetchCounts('Player',id);

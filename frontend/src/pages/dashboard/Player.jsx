@@ -63,10 +63,10 @@ const PlayerStatsPage = () => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        if (initialRender.current) {
+        /*if (initialRender.current) {
             initialRender.current = false;
             return;
-        }
+        }*/
         if (!id) return; // Ensure id is valid before making API call
 
         setLoading(true);

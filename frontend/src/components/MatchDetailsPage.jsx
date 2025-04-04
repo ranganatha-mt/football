@@ -14,10 +14,10 @@ const MatchDetailsPage = () => {
     const initialRender = useRef(true);
 
     useEffect(() => {
-        if (initialRender.current) {
+       /* if (initialRender.current) {
             initialRender.current = false;
             return;
-        }
+        }*/
         const loadMatch = async () => {
             await fetchMatchById(id);
             setLoading(false);
