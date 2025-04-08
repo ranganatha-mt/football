@@ -5,6 +5,8 @@ import toast from "react-hot-toast";
 
 const useMatchReviewStore = create((set) => ({
 
+  user_position: null,
+
   playersReviewCount:0,
   matchesReviewCount:0,
   matchesCount:0,
@@ -100,6 +102,17 @@ const useMatchReviewStore = create((set) => ({
         set({ selectedMatch: null });
     }
 },
+
+fetchPlayerDetails: async (player_id) => {  
+  try {
+      const response = await axios.get(`/api/matches/getPlayerDetails/${player_id}`);            
+      set({ user_position: response.data.player.position });
+  } catch (error) {
+      console.error("Error fetching player details:", error);
+      set({ user_position: null });
+  }
+},
+
 
 fetchCounts: async (user_type,user_id) => {
       

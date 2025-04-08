@@ -8,6 +8,7 @@ import { Layout } from "../components/Layout";
 import Pagination from "../components/Pagination";
 import dayjs from "dayjs";
 import { useAuthStore } from "../store/authUser";
+import TableSearch from "../components/TableSearch";
 //import MatchReviewPopup from "../components/MatchReviewPopup";
 
 import { PieChart, Pie, Cell,   Legend, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
@@ -32,6 +33,7 @@ const data_pie_chart = [
     { name: "Yellow Cards", value: 4, color: "#FFEB3B" }
   ];
 
+  /*
   const reviews = [
     { match_id: "1", match: "Team A vs Team B", reviewer: "Rahul Sharma",  comment: "Great player! Always gives 100% on the field." },
     { match_id: "1", match: "Team A vs Team B", reviewer: "Rahul Sharma",  comment: "Needs to work on consistency." },
@@ -40,14 +42,14 @@ const data_pie_chart = [
     { match_id: "1", match: "Team A vs Team B", reviewer: "Sophia Lee",  comment: "Truly a game-changer on the field!" }
   ];
   
- 
+ */
 
 const PlayerStatsPage = () => {
     const { user } = useAuthStore();
     const role = user?.user_type;
 
     const { id } = useParams(); // Player ID
-    const { matches, fetchMatchesByPlayerId, totalMatches } = useMatchStore();
+    const { matches, fetchMatchesByPlayerId, totalMatches,search,setSearch } = useMatchStore();
 
     
     const {     
@@ -62,8 +64,15 @@ const PlayerStatsPage = () => {
         fetchReviews,
       } = useMatchStore();
 
+      const { 
+        totalAdjustedStat,
+        isLoadingStats,
+        errorStats,
+        fetchStats,
+      } = useMatchStore();
+
     const [page, setPage] = useState(1);
-    const limit = 10;
+    const limit = 50;
     const initialRender = useRef(true);
     const [loading, setLoading] = useState(true);
     // const [showPopup, setShowPopup] = useState(false);
@@ -75,10 +84,11 @@ const PlayerStatsPage = () => {
             return;
         }*/
         setLoading(true);
-        fetchMatchesByPlayerId(id, page, limit).finally(() => setLoading(false));
+        fetchMatchesByPlayerId(id, page, limit,search,setSearch).finally(() => setLoading(false));
         fetchCounts('Player',id);
+        fetchStats(id,'','goals');
         fetchReviews(id);
-    }, [id, page]);
+    }, [id, page,search,fetchMatchesByPlayerId,limit]);
 
 
 
@@ -100,7 +110,7 @@ const PlayerStatsPage = () => {
                                 <div className="flex gap-4 justify-between flex-wrap">
                                 <Suspense fallback={<div className="loader">Loading...</div>}>
                                     <Card type="Number Of Matches Played" count={matchesCount} isLoading={isLoadingMatches} error={errorMatches}   />
-                                    <Card type="Number Of Goals Scored" count="10"   />
+                                    <Card type="Number Of Goals Scored" count={totalAdjustedStat}  isLoading={isLoadingStats} error={errorStats} />
                                 </Suspense>
                                 </div>
                             </div>
@@ -182,6 +192,12 @@ const PlayerStatsPage = () => {
                 <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-3">
                     <h2 className="text-3xl font-extrabold tracking-wide text-white">⚽  Matches List</h2>
                 </div>
+
+                <div className="flex justify-between items-center mb-6">
+            {/* <h1 className="hidden md:block text-lg font-semibold text-white">Players List</h1> */}
+            
+            <TableSearch search={search} setSearch={setSearch} />
+          </div>
 
                 {/* Show Loading State */}
                 {loading ? (

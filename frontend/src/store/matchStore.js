@@ -16,11 +16,12 @@ const useMatchStore = create((set) => ({
     totalMatches: 0,
     totalPages: 1,
     currentPage: 1,
+    search: "",
 
     // Fetch all matches
-    fetchMatches: async (page = 1, limit = 10) => {
+    fetchMatches: async (page = 1, limit = 40, search = "") => {
         try {
-            const response = await axios.get(`/api/matches?page=${page}&limit=${limit}`);
+            const response = await axios.get(`/api/matches?page=${page}&limit=${limit}&search=${search}`);
             set({
                 matches: response.data.matches,
                 totalMatches: response.data.totalMatches,
@@ -31,11 +32,12 @@ const useMatchStore = create((set) => ({
             console.error("Error fetching matches:", error);
         }
     },
+    setSearch: (search) => set({ search }),
 
-    fetchMatchesByPlayerId: async (playerId, page = 1, limit = 10) => {
+    fetchMatchesByPlayerId: async (playerId, page = 1, limit = 40, search = "") => {
         set({ loading: true, matches: [] }); // Clear matches before fetching new ones
         try {
-            const response = await axios.get(`/api/matches/player/${playerId}?page=${page}&limit=${limit}`);
+            const response = await axios.get(`/api/matches/player/${playerId}?page=${page}&limit=${limit}&search=${search}`);
             
             set({
                 matches: response.data.matches || [],
@@ -140,6 +142,39 @@ const useMatchStore = create((set) => ({
           });
         }
       },
+      fetchStats: async (player_id, match_id, stat_type) => {
+        set({
+            isLoadingStats: true,
+            errorStats: false,
+        });
+    
+        try {
+            // Construct query parameters dynamically
+            let queryParams = `player_id=${player_id}&stat_type=${stat_type}`;
+            if (match_id) queryParams += `&match_id=${match_id}`;
+    
+            // Fetch total adjusted stat
+            const response = await axios.get(`/api/players/stats?${queryParams}`);
+    
+            if (response.status === 200) {
+                set({
+                    totalAdjustedStat: response.data.total_adjusted_stat,
+                    isLoadingStats: false,
+                });
+            } else {
+                set({
+                    errorStats: true,
+                    isLoadingStats: false,
+                });
+            }
+        } catch (error) {
+            console.error("Error fetching stats:", error);
+            set({
+                isLoadingStats: false,
+                errorStats: true,
+            });
+        }
+    },
 
       fetchReviews: async (player_id) => {       
         try {

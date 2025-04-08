@@ -121,20 +121,28 @@ export const login = async(req,res) =>
         return res.status(404).json({ success:false,message: "Invalid Credentials" });
     }
 
+
+    // ✅ Always clear previous cookies first
+    res.clearCookie("jwt-football");
+    res.clearCookie("session-token");
+
+    // ✅ Clear old session token (if any)
+    user.session_token = null;
+    await user.save();
     
 
     generateTokenAndsetCookie(user.user_id,res);
 
     // If user is a reviewer, restrict multiple logins
     let sessionToken = null;
-    if (user.user_type === "Reviewer") {
-        if (user.session_token) {
-            return res.status(403).json({ success:false,message: "You are already logged in on another system" });
-        }
+    //if (user.user_type === "Reviewer") {
+        // if (user.session_token) {
+        //     return res.status(403).json({ success:false,message: "You are already logged in on another system" });
+        // }
         sessionToken = uuidv4();
         user.session_token = sessionToken;
         await user.save();
-    }
+    //}
 
     
 
@@ -164,7 +172,7 @@ export const requestotp = async(req,res) =>
   
 
    if (!contact_phone) {
-    return res.status(400).json({ sucess:false,message: "Contact information is required." });
+    return res.status(400).json({ success:false,message: "Contact information is required." });
   }
 
   const contact = '+91' + contact_phone; 
@@ -205,7 +213,7 @@ export const verifyotp = async(req,res) =>
     const { contact_phone, otp } = req.body;
 
     if (!contact_phone || !otp) {
-        return res.status(400).json({ sucess:false,message: "Contact and OTP are required." });
+        return res.status(400).json({ success:false,message: "Contact and OTP are required." });
     }
 
     try {
@@ -217,19 +225,26 @@ export const verifyotp = async(req,res) =>
             const user = await User.findOne({ where: { [Op.or]: [ { contact_phone: contact_phone }] } });
 
             
+            // ✅ Always clear previous cookies first
+            res.clearCookie("jwt-football");
+            res.clearCookie("session-token");
+
+            // ✅ Clear old session token (if any)
+            user.session_token = null;
+            await user.save();
 
             generateTokenAndsetCookie(user.user_id,res);
 
             // If user is a reviewer, restrict multiple logins
             let sessionToken = null;
-            if (user.user_type === "Reviewer") {
-                if (user.session_token) {
-                    return res.status(403).json({ success:false,message: "You are already logged in on another system" });
-                }
+            //if (user.user_type === "Reviewer") {
+                // if (user.session_token) {
+                //     return res.status(403).json({ success:false,message: "You are already logged in on another system" });
+                // }
                 sessionToken = uuidv4();
                 user.session_token = sessionToken;
                 await user.save();
-            }
+            //}
 
             // Set HTTP-only Cookie for session_token (only for reviewers)
             if (sessionToken) {
@@ -240,13 +255,13 @@ export const verifyotp = async(req,res) =>
             delete userData.password; // Remove password field
             //Remove Password from the response
             return res.status(200).json({ success:true,user: userData });
-        //return res.status(200).json({ sucess:true,message: "OTP verified successfully." });
+        //return res.status(200).json({ success:true,message: "OTP verified successfully." });
         }
 
-        res.status(400).json({ sucess:false,message: "Invalid or expired OTP." });
+        res.status(400).json({ success:false,message: "Invalid or expired OTP." });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ sucess:false,message: "Failed to verify OTP." });
+        res.status(500).json({ success:false,message: "Failed to verify OTP." });
     }
 }
 
@@ -264,7 +279,7 @@ export async function logout(req,res) {
         }
 
         res.clearCookie("session-token"); // Clear session token cookie
-        res.status(200).json({ success:true,message: "Logged Out Sucessfully" });
+        res.status(200).json({ success:true,message: "Logged Out successfully" });
    } catch (error) {
         console.error('Error in logout controller',error.message);
         res.status(500).json({ success:false,message: "Internal Server Error" });
@@ -278,7 +293,7 @@ export async function authCheck(req,res)
         res.status(200).json({ success:true,user: req.user });
     } catch (error) {
         console.log("Error in authcheck controller",error.message)
-        res.status(500).json({ sucess:false,message: "Internal Server Error" });
+        res.status(500).json({ success:false,message: "Internal Server Error" });
     }
 }
 

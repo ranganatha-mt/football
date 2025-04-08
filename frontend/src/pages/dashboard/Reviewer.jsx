@@ -1,12 +1,12 @@
 import React, { Suspense, useState,useRef ,useEffect} from "react";
 import useMatchReviewStore from "../../store/matchReviewStore.js";
-import CreateMatch from "../../components/CreateMatch.jsx";
+//import CreateMatch from "../../components/CreateMatch.jsx";
 import { useAuthStore } from "../../store/authUser";
 const Card = React.lazy(() => import("../../components/Card.jsx"));
 
 const Reviewer = () => {
   const { user } = useAuthStore();
-  const [showPopup, setShowPopup] = useState(false);
+  //const [showPopup, setShowPopup] = useState(false);
 
   const {
     playersReviewCount,
@@ -51,9 +51,9 @@ const Reviewer = () => {
             <h2 className="capitalize text-sm font-medium text-gray-500">Create Match</h2>
           </div> */}
 
-          <div className="flex justify-center items-center rounded-2xl bg-white/20 backdrop-blur-md p-4 flex-1 min-w-[130px] cursor-pointer shadow-lg border border-white/30 hover:bg-white/30 transition" onClick={() => setShowPopup(true)}>
+          {/* <div className="flex justify-center items-center rounded-2xl bg-white/20 backdrop-blur-md p-4 flex-1 min-w-[130px] cursor-pointer shadow-lg border border-white/30 hover:bg-white/30 transition" onClick={() => setShowPopup(true)}>
           <h2 className="capitalize text-sm font-medium text-white">Create Match</h2>
-        </div>
+        </div> */}
 
 
 
@@ -61,7 +61,7 @@ const Reviewer = () => {
       </div>
 
       {/* Show Create Match Popup */}
-      {showPopup && <CreateMatch onClose={() => setShowPopup(false)} />}
+      {/* {showPopup && <CreateMatch onClose={() => setShowPopup(false)} />} */}
     </div>
   );
 };

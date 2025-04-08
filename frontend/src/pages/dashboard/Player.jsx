@@ -8,6 +8,8 @@ import { Link } from "react-router-dom";
 import Pagination from "../../components/Pagination";
 import dayjs from "dayjs";
 import { useAuthStore } from "../../store/authUser";
+import CreateMatch from "../../components/CreateMatch.jsx";
+import TableSearch from "../../components/TableSearch.jsx";
 
 
 import { PieChart, Pie, Cell,   Legend, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
@@ -35,18 +37,19 @@ const data_pie_chart = [
   
 
 const PlayerStatsPage = () => {
+   const [showPopup, setShowPopup] = useState(false);
     const { user } = useAuthStore();
     const role = user?.user_type;
     const id = user?.user_id; // Fixed destructuring
 
-    const { matches, fetchMatchesByPlayerId, totalMatches } = useMatchStore();
+    const { matches, fetchMatchesByPlayerId, totalMatches,search,setSearch } = useMatchStore();
 
 
 
     const {     
       matchesCount,     
       isLoadingMatches,      
-      errorMatches,
+      errorMatches,     
       fetchCounts,
     } = useMatchStore();
 
@@ -54,11 +57,18 @@ const PlayerStatsPage = () => {
       reviews,
        fetchReviews,
      } = useMatchStore();
+
+     const { 
+      totalAdjustedStat,
+      isLoadingStats,
+      errorStats,
+      fetchStats,
+    } = useMatchStore();
   
 
 
     const [page, setPage] = useState(1);
-    const limit = 10;
+    const limit = 50;
     const initialRender = useRef(true);
     const [loading, setLoading] = useState(true);
 
@@ -70,10 +80,11 @@ const PlayerStatsPage = () => {
         if (!id) return; // Ensure id is valid before making API call
 
         setLoading(true);
-        fetchMatchesByPlayerId(id, page, limit).finally(() => setLoading(false));
+        fetchMatchesByPlayerId(id, page, limit,search,setSearch).finally(() => setLoading(false));
         fetchCounts(user.user_type,id);
+        fetchStats(id,'','goals');
         fetchReviews(id);
-    }, [id, page, fetchMatchesByPlayerId]);
+    }, [id, page, search,fetchMatchesByPlayerId,limit]);
 
 
     
@@ -96,11 +107,18 @@ const PlayerStatsPage = () => {
                   <div className="flex gap-4 justify-between flex-wrap">
                     <Suspense fallback={<div className="loader">Loading...</div>}>
                       <Card type="Number Of Matches Played" count={matchesCount} isLoading={isLoadingMatches} error={errorMatches}   />
-                      <Card type="Number Of Goals Scored" count="10"   />
+                      <Card type="Number Of Goals Scored" count={totalAdjustedStat}  isLoading={isLoadingStats} error={errorStats} />
+
+                      <div className="flex justify-center items-center rounded-2xl bg-white/20 backdrop-blur-md p-4 flex-1 min-w-[130px] cursor-pointer shadow-lg border border-white/30 hover:bg-white/30 transition" onClick={() => setShowPopup(true)}>
+          <h2 className="capitalize text-sm font-medium text-white">Create Match</h2>
+        </div>
                     </Suspense>
+                    
                   </div>
                 </div>
               </div>
+
+              
 
               <div className="flex items-center justify-center   p-4">
                     <motion.div 
@@ -180,7 +198,11 @@ const PlayerStatsPage = () => {
             <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-3">
                 <h2 className="text-3xl font-extrabold tracking-wide text-white">⚽  Matches List</h2>
             </div>
-
+            <div className="flex justify-between items-center mb-6">
+            {/* <h1 className="hidden md:block text-lg font-semibold text-white">Players List</h1> */}
+            
+            <TableSearch search={search} setSearch={setSearch} />
+          </div>
             {loading ? (
                 <p className="text-center text-gray-400 text-lg mt-4 animate-pulse">Loading matches...</p>
             ) : matches.length > 0 ? (
@@ -224,7 +246,11 @@ const PlayerStatsPage = () => {
             ) : (
                 <p className="text-center text-gray-400 text-lg mt-4">No matches available</p>
             )}
+
+{showPopup && <CreateMatch onClose={() => setShowPopup(false)} />}
         </div>
+
+        
     );
 };
 

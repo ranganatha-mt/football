@@ -85,7 +85,8 @@ const CreateMatch = ({ onClose }) => {
 
         if (response) {  
             onClose();
-            navigate("/matches");
+            //navigate("/matches");
+            window.location.href = "/matches";
         }
     };
 
@@ -114,7 +115,7 @@ const CreateMatch = ({ onClose }) => {
                 {/* Form Fields */}
                 <div className="space-y-4">
                     <input 
-                        className="w-full bg-gray-100 p-4 rounded-xl border-none outline-none focus:ring-2 focus:ring-blue-400 text-lg"
+                        className="w-full bg-gray-100 p-4 rounded-xl border-none outline-none focus:ring-2 focus:ring-blue-400 text-lg text-black"
                         placeholder="🏆 Match Name" 
                         name="match_name"
                         onChange={handleChange} 
@@ -123,7 +124,7 @@ const CreateMatch = ({ onClose }) => {
                     {errors.match_name && <p className="text-red-500 text-sm">{errors.match_name}</p>}
 
                     <input 
-                        className="w-full bg-gray-100 p-4 rounded-xl border-none outline-none focus:ring-2 focus:ring-blue-400 text-lg"
+                        className="w-full bg-gray-100 p-4 rounded-xl border-none outline-none focus:ring-2 focus:ring-blue-400 text-lg text-black"
                         placeholder="📍 Location" 
                         name="location"
                         onChange={handleChange} 
@@ -132,7 +133,7 @@ const CreateMatch = ({ onClose }) => {
                     {errors.location && <p className="text-red-500 text-sm">{errors.location}</p>}
 
                     <input 
-                        className="w-full bg-gray-100 p-4 rounded-xl border-none outline-none focus:ring-2 focus:ring-blue-400 text-lg"
+                        className="w-full bg-gray-100 p-4 rounded-xl border-none outline-none focus:ring-2 focus:ring-blue-400 text-lg text-black"
                         type="datetime-local" 
                         name="start_date"
                         onChange={handleChange} 
@@ -142,7 +143,7 @@ const CreateMatch = ({ onClose }) => {
                     {errors.start_date && <p className="text-red-500 text-sm">{errors.start_date}</p>}
 
                     <input 
-                        className="w-full bg-gray-100 p-4 rounded-xl border-none outline-none focus:ring-2 focus:ring-blue-400 text-lg"
+                        className="w-full bg-gray-100 p-4 rounded-xl border-none outline-none focus:ring-2 focus:ring-blue-400 text-lg text-black"
                         type="number" 
                         placeholder="⏳ Duration (hours)" 
                         name="duration"
@@ -155,7 +156,7 @@ const CreateMatch = ({ onClose }) => {
                 {/* Player Search */}
                 <div className="relative mt-4">
                     <input 
-                        className="w-full bg-gray-100 p-4 rounded-xl border-none outline-none focus:ring-2 focus:ring-blue-400 text-lg"
+                        className="w-full bg-gray-100 p-4 rounded-xl border-none outline-none focus:ring-2 focus:ring-blue-400 text-lg text-black"
                         placeholder="🔍 Search Players"
                         value={searchValue} 
                         onChange={(e) => {
@@ -169,7 +170,7 @@ const CreateMatch = ({ onClose }) => {
                             {playerList.map((player) => (
                                 <div key={player.user_id} 
                                     onClick={() => handleAddPlayer(player)}
-                                    className="cursor-pointer p-4 hover:bg-gray-200 border-b">
+                                    className="cursor-pointer p-4 hover:bg-gray-200 border-b text-black">
                                     {player.full_name}
                                 </div>
                             ))}
@@ -180,7 +181,7 @@ const CreateMatch = ({ onClose }) => {
                 {/* Selected Players */}
                 <div className="mt-4">
                     {players.map((player) => (
-                        <div key={player.user_id} className="flex justify-between items-center p-4 bg-gray-200 rounded-xl mb-2">
+                        <div key={player.user_id} className="flex justify-between items-center p-4 bg-gray-200 rounded-xl mb-2 text-black">
                             {player.full_name}
                             <button onClick={() => handleRemovePlayer(player.user_id)} className="text-red-500 text-sm">Remove</button>
                         </div>

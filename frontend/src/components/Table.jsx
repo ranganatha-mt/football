@@ -27,9 +27,13 @@ const Table = ({ data, columns }) => {
                       />
                       <div className="flex flex-col block md:hidden">
                         <h3 className="font-semibold">
-                          <Link to={`/player/${item.user_id}`} className="text-purple-300 hover:underline">
-                            {item.full_name}
-                          </Link>
+                        {item.user_type === "Player" ? (
+          <Link to={`/player/${item.user_id}`} className="text-purple-300 hover:underline">
+            {item.full_name}
+          </Link>
+        ) : (
+          <span>{item.full_name}</span>
+        )}
                         </h3>
                         <p className="text-xs text-gray-300">{item.contact_phone}</p>
                       </div>

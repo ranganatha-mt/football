@@ -52,6 +52,8 @@ app.use("/api/users", protectRoute, usersRoutes)
 
 app.use("/api/matches", protectRoute, matchRoutes)
 
+app.use("/api/players", protectRoute, matchRoutes)
+
 app.use("/api/messages", protectRoute,messageRoutes);
 app.use("/api/reviews", protectRoute,reviewRoutes);
 

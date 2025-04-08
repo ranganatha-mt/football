@@ -15,7 +15,7 @@ const MatchReviewPage = () => {
   const { user } = useAuthStore();
   const user_id = user?.user_id;
   const reviewer_name = user?.full_name;
-  const { reviews, messages, fetchReviews, fetchMessages, sendMessage, submitReview, selectedMatch, fetchMatchById } = useMatchReviewStore();
+  const { reviews, messages, fetchReviews, fetchMessages, sendMessage, submitReview, selectedMatch, fetchMatchById,fetchPlayerDetails,user_position  } = useMatchReviewStore();
   const reviewer_id = user_id;
   const messagesEndRef = useRef(null);
   const [highlightedMsgId, setHighlightedMsgId] = useState(null);
@@ -26,32 +26,99 @@ const MatchReviewPage = () => {
 
   const [warning, setWarning] = useState(null);
 
-  const [activeTab, setActiveTab] = useState("category1");
+  useEffect(() => {
+    if (player_id) {
+      fetchPlayerDetails(player_id);
+    }
+  }, [player_id]);
+
+
+  const [activeTab, setActiveTab] = useState("goals");
 
   const actionCategories = {
-    category1: [
+    goals: [
       { id: "goals", label: "⚽ Goals" },
-      { id: "passes", label: "🎯 Passes" },
+      { id: "header_goals", label: "🧠 Header Goals" },
+      { id: "foot_goals", label: "🦶 Foot Goals" },
+      { id: "volley_goals", label: "🥎 Volley Goals" },
+      { id: "acrobatic_goals", label: "🤸 Acrobatic Goals" },
+      { id: "freekick_goals", label: "🥅 Freekick Goals" },
+      { id: "long_range_goals", label: "📍 Long Range Goals" },
+      { id: "penalty", label: "⚡ Penalty Goals" },
+      { id: "goal_missed", label: "❌ Goal Missed" },
+      { id: "own_goal", label: "🎯 Own Goal" }
     ],
-    category2: [
-      { id: "free_kicks", label: "🥅 Free Kicks" },
-      // { id: "penalties", label: "⚡ Penalties" },
+  
+    attacks: [
+      { id: "assists", label: "🎁 Assists" },
+      { id: "cross", label: "➕ Crosses" },
+      { id: "through_balls", label: "🧵 Through Balls" },
+      { id: "attack_free_kick", label: "🆓 Attack Free Kicks" },
+      { id: "corner", label: "🌀 Corners" },
+      { id: "dribbling", label: "🕺 Dribbling" },
+      { id: "shots_on_target", label: "🎯 Shots on Target" },
+      { id: "shots_off_target", label: "🎯❌ Shots off Target" },
+      { id: "throw_outs", label: "🤾 Throw Outs" },
+      { id: "throw_ins", label: "🤾‍♂️ Throw Ins" }
     ],
-    category3: [
-      { id: "green_cards", label: "🟩 Green Cards" },
-      { id: "yellow_cards", label: "🟨 Yellow Cards" },
+  
+    defence: [
+      { id: "passes_played", label: "📤 Passes Played" },
+      { id: "passes_missed", label: "📥 Passes Missed" },
+      { id: "interceptions", label: "🛑 Interceptions" },
+      { id: "blocks", label: "🧱 Blocks" },
+      { id: "tackles", label: "🦵 Tackles" },
+      { id: "last_man_tackles", label: "🧍‍♂️ Last Man Tackles" },
+      { id: "head_clearances", label: "🧠 Clearances (Head)" },
+      { id: "corners_cleared", label: "🧹 Corners Cleared" }
     ],
-    category4: [
-      { id: "red_cards", label: "🟥 Red Cards" },
-      // { id: "fouls", label: "🚨 Fouls" },
+  
+    fouls: [
+      { id: "fouls", label: "🚨 Fouls" },
+      { id: "yellow_card", label: "🟨 Yellow Card" },
+      { id: "red_card", label: "🟥 Red Card" },
+      { id: "off_side", label: "🚩 Offside" }
     ],
+  
+    skills: [
+      { id: "skill_novice", label: "🔰 Novice" },
+      { id: "skill_intermediate", label: "⚙️ Intermediate" },
+      { id: "skill_proficient", label: "📈 Proficient" },
+      { id: "skill_advanced", label: "🔥 Advanced" },
+      { id: "skill_expert", label: "🎯 Expert" },
+      { id: "skill_mastery", label: "🏆 Mastery" }
+    ],
+  
+    freestyle: [
+      { id: "freestyle_struggling", label: "😬 Struggling" },
+      { id: "freestyle_capable", label: "🙂 Capable" },
+      { id: "freestyle_skilled", label: "🎨 Skilled" },
+      { id: "freestyle_outstanding", label: "🌟 Outstanding" },
+      { id: "freestyle_exceptional", label: "💎 Exceptional" },
+      { id: "freestyle_top_notch", label: "👑 Top Notch" }
+    ],
+  
+     ...(user_position === "Goalkeeper" && {
+       goalkeeper: [
+         { id: "gk_own_goal", label: "🎯 GK Own Goal" },
+         { id: "goals_saved", label: "🧤 Goals Saved" },
+         { id: "goals_conceded", label: "🥅 Goals Conceded" },
+         { id: "penalty_saved", label: "🛡️ Penalty Saved" },
+         { id: "clean_sheets", label: "🧼 Clean Sheets" },
+        { id: "punches", label: "👊 Punches" },
+         { id: "gk_clearances", label: "🚮 GK Clearances" },
+         { id: "goal_kicks", label: "🦵 Goal Kicks" }
+      ]
+     })
   };
+  
 
 
   useEffect(() => {
     fetchReviews(matchId, reviewer_id, player_id);
     fetchMessages(matchId, reviewer_id, player_id);
     fetchMatchById(matchId);
+    fetchPlayerDetails(player_id);
   }, [matchId, reviewer_id, player_id]);
 
   useEffect(() => {
@@ -170,25 +237,89 @@ const MatchReviewPage = () => {
 
       {/* Reviews Section */}
       <div
-        className="w-full bg-opacity-80 p-4 space-y-2 rounded-b-lg shadow-lg overflow-y-auto z-50 transition-all duration-300"
-        style={{ top: `${scrollOffset}px`, position: `${position}` }}
-      >
-        {reviews.map((review, index) => {
-          const actions = [];
-          if (review.goals > 0) actions.push(`⚽ Goals: ${review.goals}`);
-          if (review.passes > 0) actions.push(`🎯 Passes: ${review.passes}`);
-          if (review.free_kicks > 0) actions.push(`🥅 Free Kicks: ${review.free_kicks}`);
-          if (review.green_cards > 0) actions.push(`🟩 Green Cards: ${review.green_cards}`);
-          if (review.yellow_cards > 0) actions.push(`🟨 Yellow Cards: ${review.yellow_cards}`);
-          if (review.red_cards > 0) actions.push(`🟥 Red Cards: ${review.red_cards}`);
+  className="w-full bg-opacity-80 p-4 space-y-2 rounded-b-lg shadow-lg overflow-y-auto z-50 transition-all duration-300"
+  style={{ top: `${scrollOffset}px`, position: `${position}` }}
+>
+  {reviews.map((review, index) => {
+    const actionLabels = {
+      goals: "⚽ Goals",
+      header_goals: "🧠 Header Goals",
+      foot_goals: "🦶 Foot Goals",
+      volley_goals: "🥎 Volley Goals",
+      acrobatic_goals: "🤸 Acrobatic Goals",
+      freekick_goals: "🥅 Freekick Goals",
+      long_range_goals: "📍 Long Range Goals",
+      penalty: "⚡ Penalty Goals",
+      own_goal: "🎯 Own Goal",
+      goal_missed: "❌ Goal Missed",
 
-          return (
-            <div key={index} className="bg-gradient-to-r from-blue-600 to-purple-500 text-white p-3 rounded-lg text-sm max-w-md shadow-xl">
-              {actions.length > 0 ? actions.join(" | ") : "No actions recorded"}
-            </div>
-          );
-        })}
+      assists: "🎁 Assists",
+      cross: "➕ Crosses",
+      through_balls: "🧵 Through Balls",
+      attack_free_kick: "🆓 Attack Free Kicks",
+      corner: "🌀 Corners",
+      dribbling: "🕺 Dribbling",
+      shots_on_target: "🎯 Shots on Target",
+      shots_off_target: "🎯❌ Shots off Target",
+      throw_outs: "🤾 Throw Outs",
+      throw_ins: "🤾‍♂️ Throw Ins",
+
+      passes_played: "📤 Passes Played",
+      passes_missed: "📥 Passes Missed",
+      interceptions: "🛑 Interceptions",
+      blocks: "🧱 Blocks",
+      tackles: "🦵 Tackles",
+      last_man_tackles: "🧍‍♂️ Last Man Tackles",
+      head_clearances: "🧠 Clearances (Head)",
+      corners_cleared: "🧹 Corners Cleared",
+
+      fouls: "🚨 Fouls",
+      yellow_card: "🟨 Yellow Card",
+      red_card: "🟥 Red Card",
+      off_side: "🚩 Offside",
+
+      skill_novice: "🔰 Novice",
+      skill_intermediate: "⚙️ Intermediate",
+      skill_proficient: "📈 Proficient",
+      skill_advanced: "🔥 Advanced",
+      skill_expert: "🎯 Expert",
+      skill_mastery: "🏆 Mastery",
+
+      freestyle_struggling: "😬 Struggling",
+      freestyle_capable: "🙂 Capable",
+      freestyle_skilled: "🎨 Skilled",
+      freestyle_outstanding: "🌟 Outstanding",
+      freestyle_exceptional: "💎 Exceptional",
+      freestyle_top_notch: "👑 Top Notch",
+
+      gk_own_goal: "🎯 GK Own Goal",
+      goals_saved: "🧤 Goals Saved",
+      goals_conceded: "🥅 Goals Conceded",
+      penalty_saved: "🛡️ Penalty Saved",
+      clean_sheets: "🧼 Clean Sheets",
+      punches: "👊 Punches",
+      gk_clearances: "🚮 GK Clearances",
+      goal_kicks: "🦵 Goal Kicks",
+    };
+
+    const actions = [];
+    for (const [key, label] of Object.entries(actionLabels)) {
+      if (review[key] > 0) {
+        actions.push(`${label}: ${review[key]}`);
+      }
+    }
+
+    return (
+      <div
+        key={index}
+        className="bg-gradient-to-r from-blue-600 to-purple-500 text-white p-3 rounded-lg text-sm max-w-md shadow-xl"
+      >
+        {actions.length > 0 ? actions.join(" | ") : "No actions recorded"}
       </div>
+    );
+  })}
+</div>
+
 
       {/* Messages Section */}
       <div className="flex-1 overflow-y-auto p-6 space-y-4 relative z-10">
@@ -225,32 +356,36 @@ const MatchReviewPage = () => {
 
         <div className="p-4">
       {/* Tab Navigation */}
-      <div className="flex border-b border-gray-600">
-        {Object.keys(actionCategories).map((category) => (
-          <button
-            key={category}
-            onClick={() => setActiveTab(category)}
-            className={`px-4 py-2 text-white ${
-              activeTab === category ? "border-b-2 border-blue-500" : "opacity-50"
-            }`}
-          >
-            {category.replace("category", "Category ")}
-          </button>
-        ))}
-      </div>
+      {/* Tab Navigation */}
+<div className="flex flex-wrap justify-center border-b border-gray-600">
+  {Object.keys(actionCategories).map((category) => (
+    <button
+      key={category}
+      onClick={() => setActiveTab(category)}
+      className={`px-3 py-2 text-xs sm:text-sm md:text-base text-white ${
+        activeTab === category ? "border-b-2 border-blue-500 font-semibold" : "opacity-50"
+      }`}
+    >
+      {category.charAt(0).toUpperCase() + category.slice(1)}
+    </button>
+  ))}
+</div>
+
 
       {/* Actions under selected tab */}
-      <div className="mt-4 flex flex-wrap gap-3 justify-center">
-        {actionCategories[activeTab].map((action) => (
-          <button
-            key={action.id}
-            onClick={() => handleAction(action.id)}
-            className="bg-gradient-to-r from-blue-500 to-indigo-500 text-white px-5 py-2 rounded-full shadow-lg hover:scale-105 transition"
-          >
-            {action.label}
-          </button>
-        ))}
-      </div>
+      {/* Actions under selected tab */}
+<div className="mt-4 flex flex-wrap gap-3 justify-center">
+  {actionCategories[activeTab].map((action) => (
+    <button
+      key={action.id}
+      onClick={() => handleAction(action.id)}
+      className="bg-gradient-to-r from-blue-500 to-indigo-500 text-white text-xs sm:text-sm px-3 py-2 sm:px-4 sm:py-2 rounded-full shadow-lg hover:scale-105 transition"
+    >
+      {action.label}
+    </button>
+  ))}
+</div>
+
     </div>
 
           {/* {["goals", "passes", "free_kicks", "green_cards", "yellow_cards", "red_cards"].map((action, index) => (

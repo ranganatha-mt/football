@@ -6,21 +6,25 @@ import { Layout } from "../components/Layout";
 import Pagination from "../components/Pagination";
 import dayjs from "dayjs";
 import { PlusCircle } from "lucide-react"; // Icon for FAB
+import TableSearch from "../components/TableSearch";
+import { useAuthStore } from "../store/authUser";
 
 const MatchListPage = () => {
-    const { matches, fetchMatches, totalMatches } = useMatchStore();
+    const { matches, fetchMatches, totalMatches,search,setSearch } = useMatchStore();
     const [showPopup, setShowPopup] = useState(false);
     const [page, setPage] = useState(1);
     const limit = 10;
     const initialRender = useRef(true);
+    const { user } = useAuthStore();
+    const role = user?.user_type;
 
     useEffect(() => {
        /* if (initialRender.current) {
             initialRender.current = false;
             return;
         }*/
-        fetchMatches(page, limit);
-    }, [page, limit]);
+        fetchMatches(page, limit,search);
+    }, [page, limit,search,fetchMatches]);
 
     return (
         <Layout>
@@ -30,6 +34,12 @@ const MatchListPage = () => {
                 <div className="flex justify-between items-center mb-6">
                     <h2 className="text-3xl font-extrabold text-white">⚽ Matches List</h2>
                 </div>
+
+                <div className="flex justify-between items-center mb-6">
+            {/* <h1 className="hidden md:block text-lg font-semibold text-white">Players List</h1> */}
+            
+            <TableSearch search={search} setSearch={setSearch} />
+          </div>
 
                 {/* Match List Container */}
                 <div className="flex-1 flex flex-col">
@@ -68,17 +78,24 @@ const MatchListPage = () => {
                     <Pagination page={page} total={totalMatches} limit={limit} setPage={setPage} />
                 </div>
 
-                {/* Floating Create Match Button */}
-                <button 
-                    className="fixed bottom-6 right-6 bg-gradient-to-r from-green-400 to-teal-500 text-white p-4 rounded-full shadow-xl hover:scale-110 transition flex items-center gap-2"
-                    onClick={() => setShowPopup(true)}
-                >
-                    <PlusCircle size={24} />
-                    <span className="hidden sm:inline">Create Match</span>
-                </button>
+                {role !== "Reviewer" && (
+                    <>
+                        {/* Floating Create Match Button */}
+                        <button 
+                            className="fixed bottom-6 right-6 bg-gradient-to-r from-green-400 to-teal-500 text-white p-4 rounded-full shadow-xl hover:scale-110 transition flex items-center gap-2"
+                            onClick={() => setShowPopup(true)}
+                        >
+                            <PlusCircle size={24} />
+                            <span className="hidden sm:inline">Create Match</span>
+                        </button>
 
-                {/* Create Match Popup */}
-                {showPopup && <CreateMatch onClose={() => setShowPopup(false)} />}
+                        {/* Create Match Popup */}
+                        {showPopup && <CreateMatch onClose={() => setShowPopup(false)} />}
+                    </>
+                )}
+
+
+                
             </div>
         </Layout>
     );

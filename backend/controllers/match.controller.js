@@ -1,4 +1,5 @@
 import { Op } from "sequelize";
+import moment from "moment";
 import { sequelize } from "../config/db.js";
 import { Match } from "../models/matches.model.js";
 import { MatchPlayers } from "../models/match_players.model.js";
@@ -140,39 +141,71 @@ export const matchController = {
     // 🔹 Get Matches API (Manually Fetching Players & Users)
     getMatches: async (req, res) => {
         try {
-            let { page, limit } = req.query;
-            page = parseInt(page) || 1; // Default to page 1
-            limit = parseInt(limit) || 10; // Default limit to 10 matches per page
-
+            let { page, limit,search = '' } = req.query;
+            page = parseInt(page) || 1;
+            limit = parseInt(limit) || 10;
             const offset = (page - 1) * limit;
-
-            // Fetch total count of matches
+    
+            const todayStart = moment().startOf("day").toDate();
+            const todayEnd = moment().endOf("day").toDate();
+            
+    
+            // Total matches count for pagination
             const totalMatches = await Match.count({
-                where: { status: ['Scheduled', 'Ongoing'] },
+                where: { status: ['Scheduled', 'Ongoing'],
+                    match_name: {
+                      [Op.like]: `%${search}%`,
+                    }, },
             });
-
-            // Fetch paginated matches
-            const matches = await Match.findAll({
-                where: { status: ['Scheduled', 'Ongoing'] },
+    
+            // Fetch today's matches first
+            const todaysMatches = await Match.findAll({
+                where: {
+                    status: ['Scheduled', 'Ongoing'],
+                    start_date: {
+                        [Op.between]: [todayStart, todayEnd],
+                    },
+                    
+                    match_name: {
+                      [Op.like]: `%${search}%`,
+                    },
+                },
+                order: [["start_date", "ASC"]],
+            });
+    
+            // Fetch other matches (excluding today's)
+            const otherMatches = await Match.findAll({
+                where: {
+                    status: ['Scheduled', 'Ongoing'],
+                    start_date: {
+                        [Op.notBetween]: [todayStart, todayEnd],
+                    },
+                    
+                    match_name: {
+                      [Op.like]: `%${search}%`,
+                    },
+                },
                 order: [["start_date", "DESC"]],
                 limit,
-                offset
+                offset,
             });
-
+    
+            const combinedMatches = [...todaysMatches, ...otherMatches];
+    
             // Fetch players for each match
             const matchesWithPlayers = await Promise.all(
-                matches.map(async (match) => {
+                combinedMatches.map(async (match) => {
                     const matchPlayers = await MatchPlayers.findAll({
                         where: { match_id: match.match_id },
                     });
-
+    
                     const players = await Promise.all(
                         matchPlayers.map(async (mp) => {
                             const user = await User.findOne({
                                 where: { user_id: mp.player_id },
                                 attributes: ["full_name", "contact_email"],
                             });
-
+    
                             return {
                                 player_id: mp.player_id,
                                 player_name: mp.player_name,
@@ -181,66 +214,107 @@ export const matchController = {
                             };
                         })
                     );
-
+    
                     return { ...match.dataValues, players };
                 })
             );
-
+    
             return res.status(200).json({
                 success: true,
                 matches: matchesWithPlayers,
                 totalMatches,
                 totalPages: Math.ceil(totalMatches / limit),
-                currentPage: page
+                currentPage: page,
             });
-
+    
         } catch (error) {
             console.error("Error fetching matches:", error);
             return res.status(500).json({ success: false, message: "Internal server error" });
         }
     },
-    getMatchesByPlayerId : async (req, res) => {
+    getMatchesByPlayerId: async (req, res) => {
         try {
             const { player_id } = req.params;
-            let { page, limit } = req.query;
+            let { page, limit, search } = req.query;
     
-            // Set default values for pagination
+            // Set default values
             page = parseInt(page) || 1;
             limit = parseInt(limit) || 10;
             const offset = (page - 1) * limit;
+            search = search || ""; // fallback to empty string if no search input
     
-            // Check if player exists in match_players
+            // Define today's date range
+            const todayStart = new Date();
+            todayStart.setHours(0, 0, 0, 0);
+    
+            const todayEnd = new Date();
+            todayEnd.setHours(23, 59, 59, 999);
+    
+            // Get match_ids for the player
             const matchPlayerRecords = await MatchPlayers.findAll({
                 where: { player_id },
                 attributes: ['match_id']
             });
     
             if (!matchPlayerRecords.length) {
-                return res.status(404).json({ success: false,message: "No matches found for this player." });
+                return res.status(404).json({
+                    success: false,
+                    message: "No matches found for this player."
+                });
             }
     
             const matchIds = matchPlayerRecords.map(record => record.match_id);
     
-            // Fetch matches
-            const { rows: matches, count } = await Match.findAndCountAll({
-                where: { match_id: { [Op.in]: matchIds } },
+            // Fetch today's matches (unpaginated)
+            const todaysMatches = await Match.findAll({
+                where: {
+                    match_id: { [Op.in]: matchIds },
+                    start_date: {
+                        [Op.between]: [todayStart, todayEnd],
+                    },
+                    status: ['Scheduled', 'Ongoing'],
+                    match_name: {
+                        [Op.like]: `%${search}%`
+                    }
+                },
+                order: [['start_date', 'ASC']],
+            });
+    
+            // Fetch other matches (paginated)
+            const { rows: otherMatches, count } = await Match.findAndCountAll({
+                where: {
+                    match_id: { [Op.in]: matchIds },
+                    start_date: {
+                        [Op.notBetween]: [todayStart, todayEnd],
+                    },
+                    status: ['Scheduled', 'Ongoing'],
+                    match_name: {
+                        [Op.like]: `%${search}%`
+                    }
+                },
+                order: [['start_date', 'DESC']],
                 limit,
                 offset,
-                order: [['start_date', 'DESC']]
             });
+    
+            const matches = [...todaysMatches, ...otherMatches];
     
             res.json({
                 matches,
-                count,
-                totalPages: Math.ceil(count / limit),
+                count: count + todaysMatches.length,
+                totalPages: Math.ceil((count + todaysMatches.length) / limit),
                 currentPage: page
             });
     
         } catch (error) {
             console.error("Error fetching matches by player ID:", error);
-            res.status(500).json({ success: false,message: "Server error" });
+            res.status(500).json({
+                success: false,
+                message: "Server error"
+            });
         }
-    },
+    }
+    ,
     // ✅ Get Match by ID API
     getMatchById: async (req, res) => {
         try {
@@ -286,6 +360,31 @@ export const matchController = {
             return res.status(500).json({ success: false, message: "Internal server error" });
         }
     },
+    getPlayerDetails: async (req, res) => {
+        try {
+            const { player_id } = req.params;
+    
+            // Fetch the match details
+            const player = await User.findOne({
+                where: { user_id: player_id }
+            });
+    
+            if (!player) {
+                return res.status(404).json({ success: false, message: "Player not found" });
+            }
+    
+            
+    
+            return res.status(200).json({
+                success: true,
+                player
+            });
+    
+        } catch (error) {
+            console.error("Error fetching player details:", error);
+            return res.status(500).json({ success: false, message: "Internal server error" });
+        }
+    },
     matchesCount: async (req, res) => {
         try {
             const { user_type, user_id } = req.query;
@@ -313,6 +412,80 @@ export const matchController = {
             res.status(500).json({ success: false, message: 'Error fetching matches count' });
         }
     },
+    getTotalAdjustedStat : async (req, res) => {
+        try {
+            const { player_id, match_id, stat_type } = req.query;
+    
+            if (!player_id) {
+                return res.status(400).json({ success: false, message: "Player ID is required" });
+            }
+    
+            // Validate the stat_type to prevent SQL injection
+            //const validStats = ["goals", "passes", "free_kicks", "green_cards", "yellow_cards", "red_cards"];
+            const validStats = [
+                // GOALS
+                "goals", "header_goals", "foot_goals", "volley_goals", "acrobatic_goals",
+                "freekick_goals", "long_range_goals", "penalty", "goal_missed", "own_goal",
+              
+                // ATTACKS
+                "assists", "cross", "through_balls", "attack_free_kick", "corner",
+                "dribbling", "shots_on_target", "shots_off_target", "throw_outs", "throw_ins",
+              
+                // DEFENCE
+                "passes_played", "passes_missed", "interceptions", "blocks", "tackles",
+                "last_man_tackles", "head_clearances", "corners_cleared",
+              
+                // FOULS
+                "fouls", "yellow_card", "red_card", "off_side",
+              
+                // SKILLS
+                "skill_novice", "skill_intermediate", "skill_proficient", 
+                "skill_advanced", "skill_expert", "skill_mastery",
+              
+                // FREESTYLE
+                "freestyle_struggling", "freestyle_capable", "freestyle_skilled", 
+                "freestyle_outstanding", "freestyle_exceptional", "freestyle_top_notch",
+              
+                // GOALKEEPER
+                "gk_own_goal", "goals_saved", "goals_conceded", "penalty_saved",
+                "clean_sheets", "punches", "gk_clearances", "goal_kicks"
+              ];
+              
+            if (!stat_type || !validStats.includes(stat_type)) {
+                return res.status(400).json({ success: false, message: "Invalid stat type" });
+            }
+    
+            const whereCondition = match_id ? "AND match_id = :match_id" : "";
+    
+            const query = `
+                SELECT 
+                    SUM(adjusted_stat) AS total_adjusted_stat
+                FROM (
+                    SELECT 
+                        CEIL(SUM(${stat_type}) / 
+                            CASE 
+                                WHEN COUNT(DISTINCT reviewer_id) > 1 THEN COUNT(DISTINCT reviewer_id) 
+                                ELSE 1 
+                            END
+                        ) AS adjusted_stat
+                    FROM match_review
+                    WHERE player_id = :player_id ${whereCondition}
+                    GROUP BY match_id
+                ) AS subquery;
+            `;
+    
+            const [result] = await sequelize.query(query, {
+                replacements: { player_id, match_id },
+                type: sequelize.QueryTypes.SELECT
+            });
+    
+            res.json({ total_adjusted_stat: result.total_adjusted_stat || 0 });
+        } catch (error) {
+            console.error("Error fetching total adjusted stat:", error);
+            res.status(500).json({ success: false, message: 'Error fetching total adjusted stat' });
+        }
+    },
+    
     
 
 };

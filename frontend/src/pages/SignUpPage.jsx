@@ -209,7 +209,42 @@ const SignUpPage = () => {
                             <label htmlFor="position" className="text-sm font-medium text-gray-300 block">
                                 Position
                             </label>
-                            <input
+                            <select  id="position"
+                                name="position" onChange={handleInputChange}  className="w-full px-3 py-2 mt-1 border border-gray-700 rounded-md  focus:outline-none focus:ring">
+  <option value="">-- Select Position --</option>
+
+  <optgroup label="Goalkeeper">
+  <option value="Goalkeeper">Goalkeeper (GK)</option>
+</optgroup>
+
+<optgroup label="Defenders">
+  <option value="Center Back">Center Back (CB)</option>
+  <option value="Left Back">Left Back (LB)</option>
+  <option value="Right Back">Right Back (RB)</option>
+  <option value="Left Wing Back">Left Wing Back (LWB)</option>
+  <option value="Right Wing Back">Right Wing Back (RWB)</option>
+  <option value="Sweeper">Sweeper (SW)</option>
+</optgroup>
+
+<optgroup label="Midfielders">
+  <option value="Defensive Midfielder">Defensive Midfielder (CDM)</option>
+  <option value="Central Midfielder">Central Midfielder (CM)</option>
+  <option value="Attacking Midfielder">Attacking Midfielder (CAM)</option>
+  <option value="Left Midfielder">Left Midfielder (LM)</option>
+  <option value="Right Midfielder">Right Midfielder (RM)</option>
+</optgroup>
+
+<optgroup label="Forwards">
+  <option value="Left Winger">Left Winger (LW)</option>
+  <option value="Right Winger">Right Winger (RW)</option>
+  <option value="Second Striker">Second Striker (SS)</option>
+  <option value="Center Forward">Center Forward (CF)</option>
+  <option value="Striker">Striker (ST)</option>
+</optgroup>
+
+</select>
+
+                            {/* <input
                                 type="text"
                                 className="w-full px-3 py-2 mt-1 border border-gray-700 rounded-md bg-transparent text-white focus:outline-none focus:ring"
                                 placeholder="Enter Your Position"
@@ -217,7 +252,7 @@ const SignUpPage = () => {
                                 name="position"
                                 value={formData.position}
                                 onChange={handleInputChange}
-                            />
+                            /> */}
                         </div>
                     )}
 
