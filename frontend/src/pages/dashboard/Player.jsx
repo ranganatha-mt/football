@@ -228,6 +228,13 @@ const PlayerStatsPage = () => {
                                         </span>
                                     </div>
 
+                                    <Link 
+                                        to={`/matches/${match.match_id}`} 
+                                        className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-4 py-2 text-sm font-semibold rounded-full shadow-md hover:shadow-lg hover:scale-105 transition duration-300"
+                                    >
+                                        View Match
+                                    </Link>
+
                                     {isOngoing && role === "Reviewer" && (
                                         <Link
                                             to={`/review/${match.match_id}/${id}`}

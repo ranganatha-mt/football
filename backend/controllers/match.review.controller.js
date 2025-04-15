@@ -59,7 +59,12 @@ submitReview: async (req, res) => {
     
       // GOALKEEPER ACTIONS
       "gk_own_goal", "goals_saved", "goals_conceded", "penalty_saved",
-      "clean_sheets", "punches", "gk_clearances", "goal_kicks"
+      "clean_sheets", "punches", "gk_clearances", "goal_kicks",
+
+      // TRAINING
+      "dribbling_drills", "passing_accuracy", "shooting_drills", "stamina_endurance",
+      "positional_awareness", "defensive_skills", "ball_control",
+      "warmup_cooldown_participation", "tactical_understanding", "team_communication"
     ];
     
     if (!validActions.includes(action)) {
@@ -138,7 +143,19 @@ submitReview: async (req, res) => {
         clean_sheets: 0,
         punches: 0,
         gk_clearances: 0,
-        goal_kicks: 0
+        goal_kicks: 0,
+
+         // TRAINING
+        dribbling_drills: 0,
+        passing_accuracy: 0,
+        shooting_drills: 0,
+        stamina_endurance: 0,
+        positional_awareness: 0,
+        defensive_skills: 0,
+        ball_control: 0,
+        warmup_cooldown_participation: 0,
+        tactical_understanding: 0,
+        team_communication: 0
       },
 /*      
       defaults: {

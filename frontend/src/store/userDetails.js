@@ -6,10 +6,10 @@ const useStore = create((set) => ({
     data: [],
     total: 0,
     page: 1,
-    limit: 10,
+    limit: 50,
     search: "",
     userType: "Player", // "player" or "reviewer"
-    fetchData: async (page = 1, limit = 10, search = "", user_type = "Player") => {
+    fetchData: async (page = 1, limit = 50, search = "", user_type = "Player") => {
       try {
         const url = `/api/list/users?page=${page}&limit=${limit}&search=${search}&user_type=${user_type}`;
         const response = await axios.get(url);

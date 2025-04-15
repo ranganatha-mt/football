@@ -448,7 +448,12 @@ export const matchController = {
               
                 // GOALKEEPER
                 "gk_own_goal", "goals_saved", "goals_conceded", "penalty_saved",
-                "clean_sheets", "punches", "gk_clearances", "goal_kicks"
+                "clean_sheets", "punches", "gk_clearances", "goal_kicks",
+
+                // TRAINING
+                "dribbling_drills", "passing_accuracy", "shooting_drills", "stamina_endurance",
+                "positional_awareness", "defensive_skills", "ball_control",
+                "warmup_cooldown_participation", "tactical_understanding", "team_communication"
               ];
               
             if (!stat_type || !validStats.includes(stat_type)) {
@@ -462,7 +467,7 @@ export const matchController = {
                     SUM(adjusted_stat) AS total_adjusted_stat
                 FROM (
                     SELECT 
-                        CEIL(SUM(${stat_type}) / 
+                        CEIL(SUM(\`${stat_type}\`) / 
                             CASE 
                                 WHEN COUNT(DISTINCT reviewer_id) > 1 THEN COUNT(DISTINCT reviewer_id) 
                                 ELSE 1 

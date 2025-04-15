@@ -76,6 +76,18 @@ export const MatchReview = sequelize.define("match_review", {
   freestyle_exceptional: { type: DataTypes.INTEGER, defaultValue: 0 },
   freestyle_top_notch: { type: DataTypes.INTEGER, defaultValue: 0 },
 
+    // TRAINING
+    dribbling_drills: { type: DataTypes.INTEGER, defaultValue: 0 },
+    passing_accuracy: { type: DataTypes.INTEGER, defaultValue: 0 },
+    shooting_drills: { type: DataTypes.INTEGER, defaultValue: 0 },
+    stamina_endurance: { type: DataTypes.INTEGER, defaultValue: 0 },
+    positional_awareness: { type: DataTypes.INTEGER, defaultValue: 0 },
+    defensive_skills: { type: DataTypes.INTEGER, defaultValue: 0 },
+    ball_control: { type: DataTypes.INTEGER, defaultValue: 0 },
+    warmup_cooldown_participation: { type: DataTypes.INTEGER, defaultValue: 0 },
+    tactical_understanding: { type: DataTypes.INTEGER, defaultValue: 0 },
+    team_communication: { type: DataTypes.INTEGER, defaultValue: 0 },
+
   // GOALKEEPER
   gk_own_goal: { type: DataTypes.INTEGER, defaultValue: 0 },
   goals_saved: { type: DataTypes.INTEGER, defaultValue: 0 },

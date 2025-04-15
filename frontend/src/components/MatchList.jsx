@@ -13,7 +13,7 @@ const MatchListPage = () => {
     const { matches, fetchMatches, totalMatches,search,setSearch } = useMatchStore();
     const [showPopup, setShowPopup] = useState(false);
     const [page, setPage] = useState(1);
-    const limit = 10;
+    const limit = 50;
     const initialRender = useRef(true);
     const { user } = useAuthStore();
     const role = user?.user_type;
